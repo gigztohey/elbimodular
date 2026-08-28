@@ -1,16 +1,18 @@
-import type { APIRoute } from '@tanstack/start/api'
+import { createServerFileRoute } from '@tanstack/react-start'
 import { Resend } from 'resend'
 
-const TURNSTILE_SECRET = import.meta.env.TURNSTILE_SECRET_KEY
-const RESEND_API_KEY = import.meta.env.RESEND_API_KEY
 const TO_EMAIL = 'ryancuevas53@gmail.com'
 
-const resend = new Resend(RESEND_API_KEY)
+function getEnv(name: string) {
+  // works with both Vite import.meta.env and Nitro/Node process.env on Vercel
+  return (import.meta.env as Record<string, string | undefined>)[name] ?? (typeof process !== 'undefined' ? (process.env as Record<string, string | undefined>)[name] : undefined)
+}
 
 async function verifyTurnstile(token: string, ip?: string): Promise<boolean> {
-  if (!TURNSTILE_SECRET || !token) return true // math captcha mode or Turnstile not configured
+  const secret = getEnv('TURNSTILE_SECRET_KEY')
+  if (!secret || !token) return true // math captcha mode or Turnstile not configured
   const form = new URLSearchParams()
-  form.set('secret', TURNSTILE_SECRET)
+  form.set('secret', secret)
   form.set('response', token)
   if (ip) form.set('remoteip', ip)
   const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
@@ -30,8 +32,12 @@ async function sendEmail(data: {
   budget: string
   message: string
 }): Promise<{ success: boolean; error?: string }> {
-  if (!RESEND_API_KEY) {
-    return { success: false, error: 'RESEND_API_KEY not configured' }
+  const apiKey = getEnv('RESEND_API_KEY')
+  if (!apiKey) {
+    console.error('[inquiry] RESEND_API_KEY not configured - email not sent', data)
+    // For testing without key, return success so form shows "Thank you" (logs in Vercel Functions logs)
+    // Change to false in production if you want to block without key
+    return { success: false, error: 'Email service not configured. Add RESEND_API_KEY in Vercel → Settings → Environment Variables and Redeploy.' }
   }
 
   const html = `
@@ -49,13 +55,15 @@ async function sendEmail(data: {
   `
 
   try {
-    await resend.emails.send({
+    const resend = new Resend(apiKey)
+    const { error } = await resend.emails.send({
       from: 'ELBI Modular <onboarding@resend.dev>',
       to: [TO_EMAIL],
       subject: `New inquiry: ${data.projectType} — ${data.name}`,
       html,
       replyTo: data.email || undefined,
     })
+    if (error) return { success: false, error: (error as { message?: string }).message || 'Resend error' }
     return { success: true }
   } catch (err: unknown) {
     const error = err as { message?: string }
@@ -63,8 +71,8 @@ async function sendEmail(data: {
   }
 }
 
-export const APIRoute = {
-  async POST({ request }) {
+export const ServerRoute = createServerFileRoute('/api/inquiry').methods({
+  POST: async ({ request }) => {
     const contentType = request.headers.get('content-type') || ''
     let body: Record<string, string> = {}
 
@@ -106,4 +114,4 @@ export const APIRoute = {
       headers: { 'Content-Type': 'application/json' },
     })
   },
-} satisfies APIRoute
+})

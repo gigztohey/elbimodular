@@ -78,6 +78,7 @@ function Brand() {
 function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const [formError, setFormError] = useState<string | null>(null)
   const [captcha, setCaptcha] = useState(() => genChallenge())
   const [captchaInput, setCaptchaInput] = useState('')
   const [captchaError, setCaptchaError] = useState<string | null>(null)
@@ -107,6 +108,7 @@ function HomePage() {
     }
 
     setFormState('submitting')
+    setFormError(null)
     setCaptchaError(null)
 
     const formData = new FormData(form)
@@ -120,14 +122,16 @@ function HomePage() {
         body: body.toString(),
       })
 
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Submission failed')
+      const data = await response.json().catch(() => ({} as Record<string, string>))
+      if (!response.ok) throw new Error((data as { error?: string }).error || `Server error ${response.status}`)
 
       form.reset()
       setCaptchaInput('')
       refreshCaptcha()
       setFormState('success')
     } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Something went wrong. Please check your connection and try again.'
+      setFormError(msg)
       setFormState('error')
       console.error(err)
     }
@@ -386,7 +390,7 @@ function HomePage() {
                   {captchaError && <p className="form-error" role="alert">{captchaError}</p>}
                 </div>
               </div>
-              {formState === 'error' && <p className="form-error" role="alert">Something went wrong. Please check your connection and try again.</p>}
+              {formState === 'error' && <p className="form-error" role="alert">{formError || 'Something went wrong. Please check your connection and try again.'}</p>}
               <button className="submit-button" type="submit" disabled={formState === 'submitting'}>
                 {formState === 'submitting' ? 'Sending inquiry…' : 'Send project inquiry'}
                 <ArrowRight size={18} />
