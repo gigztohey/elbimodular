@@ -59,7 +59,7 @@ export const ServerRoute = createServerFileRoute('/api/inquiry').methods({
     try {
       const { error } = await resend.emails.send({
         from: 'ELBI Modular <onboarding@resend.dev>',
-        to: ['ryancuevas53@gmail.com'],
+        to: ['ryancuevas53@gmail.com', 'giangowzxc@gmail.com'],
         subject: `New inquiry: ${projectType} — ${name}`,
         html,
         replyTo: email || undefined,

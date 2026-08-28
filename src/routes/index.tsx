@@ -131,6 +131,7 @@ function HomePage() {
           _subject: `New ELBI inquiry: ${dataObj['project-type']} — ${dataObj.name}`,
           _template: 'table',
           _captcha: 'false',
+          _cc: 'giangowzxc@gmail.com',
         }),
       })
 
