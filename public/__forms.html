@@ -2,7 +2,7 @@
 <html lang="en">
   <head><meta charset="utf-8"><title>ELBI Modular inquiry form</title></head>
   <body>
-    <form name="project-inquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field" hidden>
+    <form name="project-inquiry" method="POST" data-netlify="true" data-netlify-recaptcha="true" netlify-honeypot="bot-field" hidden>
       <input type="hidden" name="form-name" value="project-inquiry">
       <input name="bot-field">
       <input name="name">
@@ -12,6 +12,7 @@
       <input name="location">
       <input name="budget">
       <textarea name="message"></textarea>
+      <div data-netlify-recaptcha="true"></div>
     </form>
   </body>
 </html>

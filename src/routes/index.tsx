@@ -288,7 +288,7 @@ function HomePage() {
               <button className="text-link" type="button" onClick={() => setFormState('idle')}>Send another inquiry <ArrowRight size={17} /></button>
             </div>
           ) : (
-            <form name="project-inquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field" onSubmit={handleSubmit}>
+            <form name="project-inquiry" method="POST" data-netlify="true" data-netlify-recaptcha="true" netlify-honeypot="bot-field" onSubmit={handleSubmit}>
               <input type="hidden" name="form-name" value="project-inquiry" />
               <p className="honeypot"><label>Do not fill this out: <input name="bot-field" /></label></p>
               <div className="form-heading">
@@ -322,6 +322,9 @@ function HomePage() {
                 </label>
               </div>
               <label>Tell us about your project *<textarea name="message" rows={4} required placeholder="What would you like built? Include approximate size, preferred style, and target timing if known." /></label>
+              <div className="captcha-wrap" aria-label="Spam verification">
+                <div data-netlify-recaptcha="true"></div>
+              </div>
               {formState === 'error' && <p className="form-error" role="alert">Something went wrong. Please check your connection and try again.</p>}
               <button className="submit-button" type="submit" disabled={formState === 'submitting'}>
                 {formState === 'submitting' ? 'Sending inquiry…' : 'Send project inquiry'}
