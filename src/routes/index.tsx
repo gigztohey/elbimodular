@@ -59,6 +59,16 @@ const process = [
   ['04', 'Install and hand over', 'We fit, align, finish, and check every detail before completion.'],
 ]
 
+const gallery = [
+  { id: 1, src: '/images/project-installation.jpg', title: 'Modern kitchen', desc: 'Custom cabinetry & island', cat: 'Custom Designs', span: 'project-large' },
+  { id: 2, src: '/images/project-storage.webp', title: 'Integrated storage', desc: 'Floor-to-ceiling built-ins', cat: '3D / Visuals', span: 'project-tall' },
+  { id: 3, src: '/images/project-kitchen.jpg', title: 'Compact kitchen', desc: 'Space-smart modular layout', cat: 'Custom Designs', span: 'project-wide' },
+  { id: 4, src: '/images/project-wardrobe.webp', title: 'Bespoke wardrobe', desc: 'Wardrobe & closet system', cat: 'Custom Designs', span: '' },
+  { id: 5, src: '/images/project-installation.jpg', title: '3D Concept', desc: 'Visual render — no people', cat: '3D / Visuals', span: '' },
+  { id: 6, src: '/images/project-kitchen.jpg', title: 'Entertainment unit', desc: 'Living storage wall', cat: 'Custom Designs', span: '' },
+]
+const filters = ['All Projects', '3D / Visuals', 'Custom Designs'] as const
+
 function Brand() {
   return (
     <a className="brand" href="#top" aria-label="ELBI Modular home">
@@ -82,10 +92,22 @@ function HomePage() {
   const [captcha, setCaptcha] = useState(() => genChallenge())
   const [captchaInput, setCaptchaInput] = useState('')
   const [captchaError, setCaptchaError] = useState<string | null>(null)
+  const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]>('All Projects')
+  const [lightbox, setLightbox] = useState<(typeof gallery)[number] | null>(null)
 
   useEffect(() => {
     setCaptcha(genChallenge())
   }, [])
+
+  useEffect(() => {
+    if (!lightbox) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setLightbox(null) }
+    document.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => { document.removeEventListener('keydown', onKey); document.body.style.overflow = '' }
+  }, [lightbox])
+
+  const filtered = activeFilter === 'All Projects' ? gallery : gallery.filter(g => g.cat === activeFilter)
 
   function refreshCaptcha() {
     setCaptcha(genChallenge())
@@ -256,26 +278,35 @@ function HomePage() {
             <div className="section-tag"><span>03</span> Selected work</div>
             <h2>Spaces transformed<br /><em>with intention.</em></h2>
           </div>
-          <p>Explore a selection of kitchens and custom cabinetry crafted around each client’s space.</p>
+          <p>Explore kitchens & custom cabinetry — no people in frame, just craftsmanship. Click to view hi-res.</p>
+        </div>
+        <div className="filter-bar" role="tablist" aria-label="Project filters">
+          {filters.map(f => (
+            <button key={f} role="tab" aria-selected={activeFilter===f} className={activeFilter===f ? 'filter-btn is-active' : 'filter-btn'} onClick={() => setActiveFilter(f)}>{f}</button>
+          ))}
         </div>
         <div className="project-grid">
-          <figure className="project project-large">
-            <img src="/images/project-installation.jpg" alt="Large modern kitchen cabinetry installation" loading="lazy" />
-            <figcaption><span>Modern kitchen</span><small>Custom cabinetry & installation</small></figcaption>
-          </figure>
-          <figure className="project project-tall">
-            <img src="/images/project-storage.webp" alt="Floor-to-ceiling custom storage cabinetry" loading="lazy" />
-            <figcaption><span>Integrated storage</span><small>Made-to-measure built-ins</small></figcaption>
-          </figure>
-          <figure className="project project-wide">
-            <img src="/images/project-kitchen.jpg" alt="White L-shaped modular kitchen cabinets" loading="lazy" />
-            <figcaption><span>Compact kitchen</span><small>Space-smart modular layout</small></figcaption>
-          </figure>
+          {filtered.map(item => (
+            <figure key={item.id} className={`project ${item.span}`} onClick={() => setLightbox(item)} role="button" tabIndex={0} aria-label={`View ${item.title}`} onKeyDown={e=> e.key==='Enter' && setLightbox(item)}>
+              <img src={item.src} alt={item.title + ' — ' + item.desc} loading="lazy" />
+              <figcaption><span>{item.title}</span><small>{item.desc}</small></figcaption>
+              <span className="project-hover"><span>{item.cat}</span><small>View →</small></span>
+            </figure>
+          ))}
         </div>
         <div className="work-cta">
           <p>Have a space in mind?</p>
           <a className="button button-dark" href="#quote">Let’s talk about it <ArrowRight size={18} /></a>
         </div>
+        {lightbox && (
+          <div className="lightbox" onClick={() => setLightbox(null)} role="dialog" aria-modal="true">
+            <div className="lightbox-inner" onClick={e=>e.stopPropagation()}>
+              <button className="lightbox-close" onClick={()=>setLightbox(null)} aria-label="Close"><X size={20}/></button>
+              <img src={lightbox.src} alt={lightbox.title} />
+              <div className="lightbox-meta"><strong>{lightbox.title}</strong><span>{lightbox.desc} · {lightbox.cat}</span></div>
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="process section" id="process">
