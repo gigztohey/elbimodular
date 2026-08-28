@@ -60,12 +60,24 @@ const process = [
 ]
 
 const gallery = [
-  { id: 1, src: '/images/project-installation.jpg', title: 'Modern kitchen', desc: 'Custom cabinetry & island', cat: 'Custom Designs', span: 'project-large' },
-  { id: 2, src: '/images/project-storage.webp', title: 'Integrated storage', desc: 'Floor-to-ceiling built-ins', cat: '3D / Visuals', span: 'project-tall' },
-  { id: 3, src: '/images/project-kitchen.jpg', title: 'Compact kitchen', desc: 'Space-smart modular layout', cat: 'Custom Designs', span: 'project-wide' },
-  { id: 4, src: '/images/project-wardrobe.webp', title: 'Bespoke wardrobe', desc: 'Wardrobe & closet system', cat: 'Custom Designs', span: '' },
-  { id: 5, src: '/images/project-installation.jpg', title: '3D Concept', desc: 'Visual render — no people', cat: '3D / Visuals', span: '' },
-  { id: 6, src: '/images/project-kitchen.jpg', title: 'Entertainment unit', desc: 'Living storage wall', cat: 'Custom Designs', span: '' },
+  { id: 1, src: '/images/portfolio/IMG20210309144150.jpg', title: 'Modern kitchen', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: 'project-large' },
+  { id: 2, src: '/images/portfolio/IMG20210310083626.jpg', title: 'Integrated storage', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: 'project-tall' },
+  { id: 3, src: '/images/portfolio/IMG20210310083629.jpg', title: '3D Concept', desc: 'Visual render - no people', cat: '3D / Visuals', span: 'project-wide' },
+  { id: 4, src: '/images/portfolio/IMG20210321172813.jpg', title: 'Bespoke wardrobe', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: '' },
+  { id: 5, src: '/images/portfolio/IMG20210412071728.jpg', title: 'Compact kitchen', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: '' },
+  { id: 6, src: '/images/portfolio/IMG20210412071736.jpg', title: 'Entertainment unit', desc: 'Visual render - no people', cat: '3D / Visuals', span: '' },
+  { id: 7, src: '/images/portfolio/IMG20210415141612.jpg', title: 'Modern kitchen', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: '' },
+  { id: 8, src: '/images/portfolio/IMG20210422161047.jpg', title: 'Integrated storage', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: '' },
+  { id: 9, src: '/images/portfolio/IMG20210422161054.jpg', title: '3D Concept', desc: 'Visual render - no people', cat: '3D / Visuals', span: '' },
+  { id: 10, src: '/images/portfolio/IMG20210422174443.jpg', title: 'Bespoke wardrobe', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: '' },
+  { id: 11, src: '/images/portfolio/IMG20210422174449.jpg', title: 'Compact kitchen', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: '' },
+  { id: 12, src: '/images/portfolio/IMG20210422174452.jpg', title: 'Entertainment unit', desc: 'Visual render - no people', cat: '3D / Visuals', span: '' },
+  { id: 13, src: '/images/portfolio/IMG20210422174457.jpg', title: 'Modern kitchen', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: '' },
+  { id: 14, src: '/images/portfolio/IMG20210422174507.jpg', title: 'Integrated storage', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: '' },
+  { id: 15, src: '/images/portfolio/IMG20210422174510.jpg', title: '3D Concept', desc: 'Visual render - no people', cat: '3D / Visuals', span: '' },
+  { id: 16, src: '/images/portfolio/IMG20210422174518.jpg', title: 'Bespoke wardrobe', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: '' },
+  { id: 17, src: '/images/portfolio/IMG20210422174551.jpg', title: 'Compact kitchen', desc: 'Custom cabinetry & install', cat: 'Custom Designs', span: '' },
+  { id: 18, src: '/images/portfolio/IMG20210422174557.jpg', title: 'Entertainment unit', desc: 'Visual render - no people', cat: '3D / Visuals', span: '' },
 ]
 const filters = ['All Projects', '3D / Visuals', 'Custom Designs'] as const
 
