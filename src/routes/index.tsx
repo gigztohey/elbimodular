@@ -272,6 +272,45 @@ function HomePage() {
         </div>
       </section>
 
+      <section className="value-prop section" id="why-us" aria-label="Why clients choose ELBI">
+        <div className="value-grid">
+          <div>
+            <div className="section-tag"><span>02b</span> Why ELBI</div>
+            <h2>Premium quality.<br /><em>On time, every time.</em></h2>
+            <p>Built to convert walk-ins into booked projects — clear service, proven finish, reliable execution.</p>
+          </div>
+          <div className="value-cols">
+            <div>
+              <h3><Hammer size={16}/> Services</h3>
+              <ul>
+                <li><Check size={14}/> Custom kitchens & islands</li>
+                <li><Check size={14}/> Wardrobes / built-in storage</li>
+                <li><Check size={14}/> 3D visuals & shop drawings</li>
+                <li><Check size={14}/> Professional install & handover</li>
+              </ul>
+            </div>
+            <div>
+              <h3><ShieldCheck size={16}/> Quality guarantee</h3>
+              <ul>
+                <li><Check size={14}/> Made to measure ±2mm precision</li>
+                <li><Check size={14}/> Premium hardware & clean finish</li>
+                <li><Check size={14}/> Site-checked, level & aligned</li>
+                <li><Check size={14}/> 12-month workmanship warranty</li>
+              </ul>
+            </div>
+            <div>
+              <h3><Sparkles size={16}/> Turnaround</h3>
+              <ul>
+                <li><Check size={14}/> Quote in 24h</li>
+                <li><Check size={14}/> 3D concept in 2–3 days</li>
+                <li><Check size={14}/> Fabrication 12–18 days</li>
+                <li><Check size={14}/> Install in 1–2 days</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="work section" id="work">
         <div className="work-header">
           <div>
