@@ -111,19 +111,31 @@ function HomePage() {
     setFormError(null)
     setCaptchaError(null)
 
-    const formData = new FormData(form)
-    const body = new URLSearchParams()
-    formData.forEach((value, key) => body.append(key, value.toString()))
+    const dataObj: Record<string, string> = {}
+    new FormData(form).forEach((v, k) => (dataObj[k] = v.toString()))
 
     try {
-      const response = await fetch('/api/inquiry', {
+      // Direct email via FormSubmit AJAX — no server route needed, fixes Vercel 404
+      // First submission requires confirming activation email sent to ryancuevas53@gmail.com
+      const response = await fetch('https://formsubmit.co/ajax/ryancuevas53@gmail.com', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: body.toString(),
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          name: dataObj.name,
+          phone: dataObj.phone,
+          email: dataObj.email || 'not provided',
+          project_type: dataObj['project-type'],
+          location: dataObj.location,
+          budget: dataObj.budget || 'Not specified',
+          message: dataObj.message,
+          _subject: `New ELBI inquiry: ${dataObj['project-type']} — ${dataObj.name}`,
+          _template: 'table',
+          _captcha: 'false',
+        }),
       })
 
       const data = await response.json().catch(() => ({} as Record<string, string>))
-      if (!response.ok) throw new Error((data as { error?: string }).error || `Server error ${response.status}`)
+      if (!response.ok) throw new Error((data as { message?: string }).message || (data as { error?: string }).error || `Server error ${response.status}`)
 
       form.reset()
       setCaptchaInput('')
