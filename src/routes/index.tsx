@@ -16,7 +16,19 @@ import {
   Sparkles,
   X,
 } from 'lucide-react'
-import { type FormEvent, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
+
+declare global {
+  interface Window {
+    turnstile?: { reset: (el?: string | HTMLElement) => void; getResponse: (el?: string | HTMLElement) => string }
+    onTurnstileSuccess?: (token: string) => void
+    onTurnstileExpired?: () => void
+  }
+}
+
+// Cloudflare Turnstile demo key – replace with your real sitekey from https://dash.cloudflare.com/?to=/:account/turnstile
+// Demo always passes: 1x00000000000000000000AA  |  Real example: 0x4AAAAAAADnW_KP2j...
+const TURNSTILE_SITEKEY = '1x00000000000000000000AA'
 
 export const Route = createFileRoute('/')({
   component: HomePage,
@@ -72,17 +84,55 @@ function Brand() {
 function HomePage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [formState, setFormState] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [captchaError, setCaptchaError] = useState<string | null>(null)
+  const turnstileRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    // Expose callbacks for Turnstile implicit rendering
+    window.onTurnstileSuccess = (token: string) => {
+      setCaptchaToken(token)
+      setCaptchaError(null)
+    }
+    window.onTurnstileExpired = () => setCaptchaToken(null)
+
+    if (document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]')) return
+    const script = document.createElement('script')
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'
+    script.async = true
+    script.defer = true
+    document.body.appendChild(script)
+
+    return () => {
+      delete window.onTurnstileSuccess
+      delete window.onTurnstileExpired
+    }
+  }, [])
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setFormState('submitting')
 
+    // honeypot check
     const form = event.currentTarget
+    const honeypot = (form.elements.namedItem('bot-field') as HTMLInputElement | null)?.value
+    if (honeypot) return // silently drop bots
+
+    if (!captchaToken) {
+      setCaptchaError('Please complete the verification.')
+      return
+    }
+
+    setFormState('submitting')
+    setCaptchaError(null)
+
     const formData = new FormData(form)
+    formData.set('cf-turnstile-response', captchaToken)
     const body = new URLSearchParams()
     formData.forEach((value, key) => body.append(key, value.toString()))
 
     try {
+      // Works on Netlify (Netlify Forms) and on Vercel as visual success.
+      // On Vercel, replace '/__forms.html' with your API endpoint (e.g., /api/inquiry) and verify token server-side.
       const response = await fetch('/__forms.html', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -91,6 +141,8 @@ function HomePage() {
 
       if (!response.ok) throw new Error('Submission failed')
       form.reset()
+      setCaptchaToken(null)
+      window.turnstile?.reset(turnstileRef.current ?? undefined)
       setFormState('success')
     } catch {
       setFormState('error')
@@ -288,7 +340,7 @@ function HomePage() {
               <button className="text-link" type="button" onClick={() => setFormState('idle')}>Send another inquiry <ArrowRight size={17} /></button>
             </div>
           ) : (
-            <form name="project-inquiry" method="POST" data-netlify="true" data-netlify-recaptcha="true" netlify-honeypot="bot-field" onSubmit={handleSubmit}>
+            <form name="project-inquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field" onSubmit={handleSubmit}>
               <input type="hidden" name="form-name" value="project-inquiry" />
               <p className="honeypot"><label>Do not fill this out: <input name="bot-field" /></label></p>
               <div className="form-heading">
@@ -323,7 +375,22 @@ function HomePage() {
               </div>
               <label>Tell us about your project *<textarea name="message" rows={4} required placeholder="What would you like built? Include approximate size, preferred style, and target timing if known." /></label>
               <div className="captcha-wrap" aria-label="Spam verification">
-                <div data-netlify-recaptcha="true"></div>
+                <div className="captcha-box">
+                  <div className="captcha-head">
+                    <ShieldCheck size={14} />
+                    <span>Security check</span>
+                    <small>Protected by Cloudflare</small>
+                  </div>
+                  <div
+                    ref={turnstileRef}
+                    className="cf-turnstile"
+                    data-sitekey={TURNSTILE_SITEKEY}
+                    data-callback="onTurnstileSuccess"
+                    data-expired-callback="onTurnstileExpired"
+                    data-theme="light"
+                  ></div>
+                  {captchaError && <p className="form-error" role="alert">{captchaError}</p>}
+                </div>
               </div>
               {formState === 'error' && <p className="form-error" role="alert">Something went wrong. Please check your connection and try again.</p>}
               <button className="submit-button" type="submit" disabled={formState === 'submitting'}>
